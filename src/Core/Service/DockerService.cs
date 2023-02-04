@@ -6,7 +6,7 @@ namespace SwitchBoardApi.Core.Service
 {
 	public class DockerService : IDockerService
     {
-        private IDockerHost _dockerHost;
+        private readonly IDockerHost _dockerHost;
 		public DockerService(IDockerHost dockerHost)
 		{
             _dockerHost = dockerHost;
@@ -17,7 +17,7 @@ namespace SwitchBoardApi.Core.Service
             return await _dockerHost.StopContainer(containerId);
         }
 
-        public async Task<IEnumerable<string>> MonitorContainer(string containerId)
+        public async Task<IEnumerable<string>> MonitorContainer()
         {
             var containers = await _dockerHost.ListContainers();
             var statusList = new List<string>();
