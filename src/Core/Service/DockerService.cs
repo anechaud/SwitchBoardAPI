@@ -26,7 +26,8 @@ namespace SwitchBoardApi.Core.Service
                 var continer = new ContainerStatus
                 {
                     ContainerId = item.ID,
-                    Status = item.State
+                    Status = item.State,
+                    ContainerName = item.Names.Select(x=>x).FirstOrDefault()
                 };
                 statusList.Add(continer.ToString());
             }
@@ -35,7 +36,19 @@ namespace SwitchBoardApi.Core.Service
 
         public async Task StartContainer(string image, string containerName, CancellationToken ct = default)
         {
-            await _dockerHost.StartContainer(image, containerName, ct);
+            var containers = await _dockerHost.ListContainers();
+            var existingContainer = containers?.Where(x => x.Names.FirstOrDefault().Contains(containerName))?.FirstOrDefault();
+            string? containerId;
+            if (existingContainer != null)
+            {
+                containerId = existingContainer.ID;
+            }
+            else
+            {
+                containerId = await _dockerHost.CreateContainer(image, containerName, ct);
+            }
+
+            var started = await _dockerHost.StartContainer(containerId, ct);
         }
     }
 }

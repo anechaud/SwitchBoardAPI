@@ -12,6 +12,7 @@ namespace SwitchBoardApi.Core.Host
     {
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         private static readonly bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        private static readonly bool IsMac = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         private readonly IConfiguration Configuration;
         private readonly DockerClient _dockerClient;
         public DockerHost(IConfiguration configuration)
@@ -25,13 +26,18 @@ namespace SwitchBoardApi.Core.Host
             var existingContainers = await ListContainers();
 
             var exists = existingContainers.Any(x => x.Image == image);
-
+            Progress<JSONMessage> progress = new Progress<JSONMessage>();
+            progress.ProgressChanged += (sender, message) =>
+            {
+                Console.WriteLine(message.Status);
+            };
             if (!exists)
             {
                 await _dockerClient.Images.CreateImageAsync(new ImagesCreateParameters
                 {
                     FromImage = image,
-                }, null, null, ct);
+                    Tag = "latest"
+                }, null, progress, ct);
             }
         }
 
@@ -45,16 +51,15 @@ namespace SwitchBoardApi.Core.Host
                 Name = containerName,
                 HostConfig = new HostConfig
                 {
-                    PublishAllPorts = true,
-                    AutoRemove = true
+                    PublishAllPorts = true
                 }
             }, ct)).ID;
         }
 
-        public async Task StartContainer(string image, string containerName, CancellationToken ct = default)
+        public async Task<bool> StartContainer(string containerId, CancellationToken ct = default)
         {
-            var containerId = await CreateContainer(image, containerName, ct);
-            await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters(), ct);
+            var isStarted = await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters(), ct);
+            return isStarted;
         }
 
         public ValueTask DisposeAsync()
@@ -63,17 +68,6 @@ namespace SwitchBoardApi.Core.Host
             return new ValueTask();
         }
 
-        private static string DockerApiUri()
-        {
-            if (IsWindows)
-                return "npipe://./pipe/docker_engine";
-
-            if (IsLinux)
-                return "unix:///var/run/docker.sock";
-
-            throw new Exception(
-                "Was unable to determine what OS this is running on, does not appear to be Windows or Linux!?");
-        }
 
         public async Task<IList<ContainerListResponse>> ListContainers()
         {
@@ -104,6 +98,24 @@ namespace SwitchBoardApi.Core.Host
                                                     CancellationToken.None);
 
             return stopped;
+        }
+
+        private async Task<IList<ImagesListResponse>> ListImages()
+        {
+            var images = await _dockerClient.Images.ListImagesAsync(new ImagesListParameters() { All = true });
+            return images;
+        }
+
+        private static string DockerApiUri()
+        {
+            if (IsWindows)
+                return "npipe://./pipe/docker_engine";
+
+            if (IsLinux || IsMac)
+                return "unix:///var/run/docker.sock";
+
+            throw new Exception(
+                "Was unable to determine what OS this is running on, does not appear to be Windows or Linux!?");
         }
     }
 }

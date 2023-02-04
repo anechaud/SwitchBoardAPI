@@ -39,7 +39,6 @@ public class SwitchBoardApi: ControllerBase
                 Status = (int)HttpStatusCode.InternalServerError
             });
         }
-        
     }
 
     [HttpPost]
@@ -63,7 +62,6 @@ public class SwitchBoardApi: ControllerBase
                 Status = (int)HttpStatusCode.InternalServerError
             });
         }
-        
     }
 
     [HttpDelete]
