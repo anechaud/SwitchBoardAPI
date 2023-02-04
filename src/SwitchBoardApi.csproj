@@ -11,6 +11,19 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Core\" />
+    <None Remove="Core\Host\" />
+    <None Remove="Core\Service\" />
+    <None Remove="Core\Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Core\" />
+    <Folder Include="Core\Host\" />
+    <Folder Include="Core\Service\" />
+    <Folder Include="Core\Model\" />
+  </ItemGroup>
 </Project>

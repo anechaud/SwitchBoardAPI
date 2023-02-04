@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace SwitchBoardApi.Controllers;
+namespace SwitchBoardApi.API;
 
 [ApiController]
-[Route("[controller]")]
-public class SwitchBoardController : ControllerBase
+[Route("[api/SwitchBoard]")]
+public class SwitchBoardApi: ControllerBase
 {
-    private readonly ILogger<SwitchBoardController> _logger;
+    private readonly ILogger<SwitchBoardApi> _logger;
 
-    public SwitchBoardController(ILogger<SwitchBoardController> logger)
+    public SwitchBoardApi(ILogger<SwitchBoardApi> logger)
     {
         _logger = logger;
     }
@@ -31,4 +31,3 @@ public class SwitchBoardController : ControllerBase
         return Ok("Deleted");
     }
 }
-
