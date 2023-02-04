@@ -48,17 +48,17 @@ public class SwitchBoardApi: ControllerBase
         try
         {
             await _dockerService.StartContainer(image, containerName, ct);
-            return StatusCode(201, $"Container created {containerName}");
+            return StatusCode(201, $"Container started - {containerName}");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to create container");
+            _logger.LogError(ex, "Failed to start container");
 
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails()
             {
                 Type = "https://tools.ietf.org/html/rfc7807",
                 Title = "Error",
-                Detail = "Unable to create container",
+                Detail = "Unable to start container",
                 Status = (int)HttpStatusCode.InternalServerError
             });
         }
