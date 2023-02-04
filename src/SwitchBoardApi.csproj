@@ -19,11 +19,13 @@
     <None Remove="Core\Host\" />
     <None Remove="Core\Service\" />
     <None Remove="Core\Model\" />
+    <None Remove="Core\Config\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
     <Folder Include="Core\Host\" />
     <Folder Include="Core\Service\" />
     <Folder Include="Core\Model\" />
+    <Folder Include="Core\Config\" />
   </ItemGroup>
 </Project>

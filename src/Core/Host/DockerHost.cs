@@ -12,11 +12,12 @@ namespace SwitchBoardApi.Core.Host
     {
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         private static readonly bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
+        private readonly IConfiguration Configuration;
         private readonly DockerClient _dockerClient;
-        public DockerHost()
+        public DockerHost(IConfiguration configuration)
         {
             _dockerClient = new DockerClientConfiguration(new Uri(DockerApiUri())).CreateClient();
+            Configuration = configuration;
         }
 
         private async Task PullImageIfNotExist(string image, CancellationToken ct = default)
