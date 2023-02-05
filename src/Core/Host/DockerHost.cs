@@ -45,13 +45,36 @@ namespace SwitchBoardApi.Core.Host
         {
             await PullImageIfNotExist(image, ct);
 
+            var volumeList = await _dockerClient.Volumes.ListAsync();
+            var volumeCount = volumeList.Volumes.Where(v => v.Name == containerName).Count();
+            if (volumeCount <= 0)
+            {
+                await _dockerClient.Volumes.CreateAsync(new VolumesCreateParameters
+                {
+                    Name = $"vol_{containerName}",
+                });
+            };
+
             return (await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
                 Image = image,
                 Name = containerName,
                 HostConfig = new HostConfig
                 {
-                    PublishAllPorts = true
+                    PublishAllPorts = true,
+                    //Mounts = new List<Mount>
+                    //        {
+                    //            new Mount
+                    //            {
+                    //                Source ="/Users/anirbanmondal/Desktop/DockerTest",
+                    //                Target = "/usr/share",
+                    //                Type = "bind"
+                    //            }
+                    //        },
+                    Binds = new List<string>
+                            {
+                                $"vol_{containerName}:/data"
+                            }
                 }
             }, ct)).ID;
         }
