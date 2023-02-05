@@ -41,42 +41,21 @@ namespace SwitchBoardApi.Core.Host
             }
         }
 
-        public async Task<string> CreateContainer(string image, string containerName, CancellationToken ct = default)
+        public async Task<string> CreateContainer(CreateContainerParameters createContainerParameters, CancellationToken ct = default)
         {
-            await PullImageIfNotExist(image, ct);
+            await PullImageIfNotExist(createContainerParameters.Image, ct);
 
-            var volumeList = await _dockerClient.Volumes.ListAsync();
-            var volumeCount = volumeList.Volumes.Where(v => v.Name == containerName).Count();
-            if (volumeCount <= 0)
-            {
-                await _dockerClient.Volumes.CreateAsync(new VolumesCreateParameters
-                {
-                    Name = $"vol_{containerName}",
-                });
-            };
+            //var volumeList = await _dockerClient.Volumes.ListAsync();
+            //var volumeCount = volumeList.Volumes.Where(v => v.Name == containerName).Count();
+            //if (volumeCount <= 0)
+            //{
+            //    await _dockerClient.Volumes.CreateAsync(new VolumesCreateParameters
+            //    {
+            //        Name = $"vol_{containerName}",
+            //    });
+            //};
 
-            return (await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
-            {
-                Image = image,
-                Name = containerName,
-                HostConfig = new HostConfig
-                {
-                    PublishAllPorts = true,
-                    //Mounts = new List<Mount>
-                    //        {
-                    //            new Mount
-                    //            {
-                    //                Source ="/Users/anirbanmondal/Desktop/DockerTest",
-                    //                Target = "/usr/share",
-                    //                Type = "bind"
-                    //            }
-                    //        },
-                    Binds = new List<string>
-                            {
-                                $"vol_{containerName}:/data"
-                            }
-                }
-            }, ct)).ID;
+            return (await _dockerClient.Containers.CreateContainerAsync(createContainerParameters, ct)).ID;
         }
 
         public async Task<bool> StartContainer(string containerId, CancellationToken ct = default)

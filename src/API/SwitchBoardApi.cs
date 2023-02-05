@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using SwitchBoardApi.Core.Model;
 using SwitchBoardApi.Core.Service;
 
 namespace SwitchBoardApi.API;
@@ -43,12 +44,24 @@ public class SwitchBoardApi: ControllerBase
 
     [HttpPost]
     [Route("")]
-    public async Task<ActionResult> CreateContiner(string image, string containerName, CancellationToken ct = default)
+    public async Task<ActionResult> CreateContiner(ContainerRequest containerRequest, CancellationToken ct = default)
     {
+        if (!ModelState.IsValid)
+        {
+            _logger.LogDebug("SwitchBoardApi Service Request had bad model");
+            return BadRequest(new ValidationProblemDetails(ModelState)
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Title = "Error",
+                Detail = "Unable to Post SwitchBoardApi",
+            });
+        }
+
         try
         {
-            await _dockerService.StartContainer(image, containerName, ct);
-            return StatusCode(201, $"Container started - {containerName}");
+            
+            await _dockerService.StartContainer(containerRequest, ct);
+            return StatusCode(201, $"Container started - {containerRequest.ContainerName}");
         }
         catch (Exception ex)
         {
@@ -58,7 +71,7 @@ public class SwitchBoardApi: ControllerBase
             {
                 Type = "https://tools.ietf.org/html/rfc7807",
                 Title = "Error",
-                Detail = "Unable to start container",
+                Detail = $"Unable to start container. {ex.Message}",
                 Status = (int)HttpStatusCode.InternalServerError
             });
         }
