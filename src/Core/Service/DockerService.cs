@@ -17,7 +17,16 @@ namespace SwitchBoardApi.Core.Service
 
         public async Task<bool> DeleteContainer(string containerId)
         {
-            return await _dockerHost.StopContainer(containerId);
+            try
+            {
+                await _dockerHost.StopContainer(containerId);
+                await _dockerHost.RemoveContainer(containerId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<IEnumerable<string>> MonitorContainer()
@@ -58,15 +67,20 @@ namespace SwitchBoardApi.Core.Service
 
         private CreateContainerParameters FormContainerParamObject(ContainerRequest containerRequest)
         {
-            return new CreateContainerParameters
+
+            var requestObj = new CreateContainerParameters
             {
                 Image = containerRequest.Image,
                 Name = containerRequest.ContainerName,
-                Env=containerRequest.Enviorment,
                 HostConfig = new HostConfig
                 {
                     PublishAllPorts = true,
-                    Mounts = new List<Mount>
+                },
+                Env = containerRequest.Enviorment
+            };
+
+            if (!string.IsNullOrEmpty(containerRequest.MountSource) && !string.IsNullOrEmpty(containerRequest.MountTarget))
+                requestObj.HostConfig.Mounts = new List<Mount>
                             {
                                 new Mount
                                 {
@@ -74,13 +88,8 @@ namespace SwitchBoardApi.Core.Service
                                     Target = containerRequest.MountTarget,
                                     Type = "bind"
                                 }
-                            },
-                    //Binds = new List<string>
-                    //        {
-                    //            $"vol_{containerName}:/data"
-                    //        }
-                }
-            };
+                            };
+            return requestObj;
         }
     }
 }

@@ -81,11 +81,11 @@ namespace SwitchBoardApi.Core.Host
             return containers;
         }
 
-        public async Task KillContainer(string containerId)
+        public async Task RemoveContainer(string containerId)
         {
-            await _dockerClient.Containers.KillContainerAsync(
+            await _dockerClient.Containers.RemoveContainerAsync(
                                                     containerId,
-                                                    new ContainerKillParameters(),
+                                                    new ContainerRemoveParameters(),
                                                     CancellationToken.None);
         }
 

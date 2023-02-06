@@ -8,7 +8,7 @@ namespace SwitchBoardApi.Core.Host
         public Task<string> CreateContainer(CreateContainerParameters createContainerParameters, CancellationToken ct = default);
         public Task<bool> StartContainer(string containerId, CancellationToken ct = default);
         public Task<IList<ContainerListResponse>> ListContainers();
-        public Task KillContainer(string containerId);
+        public Task RemoveContainer(string containerId);
         public Task<bool> StopContainer(string containerId);
         //public Task GetContainerStatus();
     }

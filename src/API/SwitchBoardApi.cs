@@ -6,9 +6,9 @@ using SwitchBoardApi.Core.Service;
 
 namespace SwitchBoardApi.API;
 
-[ApiController]
+//[ApiController]
 [Route("api/SwitchBoard")]
-public class SwitchBoardApi: ControllerBase
+public class SwitchBoardApi : ControllerBase
 {
     private readonly ILogger<SwitchBoardApi> _logger;
     private readonly IDockerService _dockerService;
@@ -23,80 +23,31 @@ public class SwitchBoardApi: ControllerBase
     [Route("")]
     public async Task<ActionResult<string>> GetAllContainerStatus()
     {
-        try
-        {
-            var containerStatus = await _dockerService.MonitorContainer();
-            return Ok(JsonConvert.SerializeObject(containerStatus));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to get container status");
-
-            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails()
-            {
-                Type = "https://tools.ietf.org/html/rfc7807",
-                Title = "Error",
-                Detail = "Unable to get container status",
-                Status = (int)HttpStatusCode.InternalServerError
-            });
-        }
+        var containerStatus = await _dockerService.MonitorContainer();
+        return Ok(JsonConvert.SerializeObject(containerStatus));
     }
 
     [HttpPost]
     [Route("")]
-    public async Task<ActionResult> CreateContiner(ContainerRequest containerRequest, CancellationToken ct = default)
+    public async Task<ActionResult> CreateContiner([FromBody] ContainerRequest containerRequest, CancellationToken ct = default)
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogDebug("SwitchBoardApi Service Request had bad model");
-            return BadRequest(new ValidationProblemDetails(ModelState)
-            {
-                Type = "https://tools.ietf.org/html/rfc7807",
-                Title = "Error",
-                Detail = "Unable to Post SwitchBoardApi",
-            });
+            var message = string.Join(" , ", ModelState.Values
+                                .SelectMany(v => v.Errors)
+                                .Select(e => e.ErrorMessage));
+            throw new BadHttpRequestException(message);
         }
-
-        try
-        {
-            
-            await _dockerService.StartContainer(containerRequest, ct);
-            return StatusCode(201, $"Container started - {containerRequest.ContainerName}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to start container");
-
-            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails()
-            {
-                Type = "https://tools.ietf.org/html/rfc7807",
-                Title = "Error",
-                Detail = $"Unable to start container. {ex.Message}",
-                Status = (int)HttpStatusCode.InternalServerError
-            });
-        }
+        await _dockerService.StartContainer(containerRequest, ct);
+        return StatusCode(201, $"Container started - {containerRequest.ContainerName}");
     }
 
     [HttpDelete]
     [Route("")]
     public async Task<ActionResult<string>> DeleteContainer(string containerId)
     {
-        try
-        {
-            await _dockerService.DeleteContainer(containerId);
-            return Ok("Deleted");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to delete container");
+        await _dockerService.DeleteContainer(containerId);
+        return Ok("Deleted");
 
-            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails()
-            {
-                Type = "https://tools.ietf.org/html/rfc7807",
-                Title = "Error",
-                Detail = "Unable to delete container",
-                Status = (int)HttpStatusCode.InternalServerError
-            });
-        }
     }
 }
