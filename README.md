@@ -3,7 +3,7 @@
 ### Introduction
 SwitchBoardApi efficiently manages computational simulation resources. The API will handle the spawning and monitoring of Docker containers for incoming simulation jobs, allowing each job to be executed in its own container. In addition, the API allows the simulations' results to be saved to a persistent storage volume, ensuring that the results are accessible even after the container has been removed.
 
-### Project Support Features
+### SwitchBoardAPI Features
 1. Create or spawn a container
 2. Get status of all the containers
 3. Stop/Delete a container
