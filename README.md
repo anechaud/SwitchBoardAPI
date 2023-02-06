@@ -11,11 +11,10 @@ SwitchBoardApi efficiently manages computational simulation resources. The API w
 ### Installation Guide
 * Clone this repository
 * The main branch is the most stable branch at any given time, ensure you're working from it.
-* Install .net 7 in your machine
 
 ### Usage
 * Run dotnet run to start the application.
-* Connect to the API using Postman or swagger on port 7066.
+* Connect to the API using Postman or swagger on port 5016.
 
 ### API Endpoints
 | HTTP Verbs | Endpoints | Action |
