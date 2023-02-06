@@ -63,8 +63,8 @@ namespace SwitchBoardApi.Core.Service
 
             var requestObj = new CreateContainerParameters
             {
-                Image = containerRequest.Image,
-                Name = containerRequest.ContainerName,
+                Image = containerRequest.Image.Trim(),
+                Name = containerRequest.ContainerName.Trim(),
                 HostConfig = new HostConfig
                 {
                     PublishAllPorts = true,

@@ -18,6 +18,10 @@ public class SwitchBoardApi : ControllerBase
         _dockerService = dockerService;
     }
 
+    /// <summary>
+    /// Get all container status
+    /// </summary>
+    /// <returns>A model that has information about all the containers state</returns>
     [HttpGet]
     [Route("")]
     public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetAllContainerStatus()
@@ -26,6 +30,13 @@ public class SwitchBoardApi : ControllerBase
         return Ok(containerStatus);
     }
 
+    /// <summary>
+    /// Starts a container
+    /// </summary>
+    /// <param name="containerRequest"></param>
+    /// <param name="ct"></param>
+    /// <returns>Name of the started container</returns>
+    /// <exception cref="BadHttpRequestException"></exception>
     [HttpPost]
     [Route("")]
     public async Task<ActionResult> CreateContiner([FromBody] ContainerRequest containerRequest, CancellationToken ct = default)
@@ -41,6 +52,11 @@ public class SwitchBoardApi : ControllerBase
         return StatusCode(201, $"Container started - {containerRequest.ContainerName}");
     }
 
+    /// <summary>
+    /// Stops and removes a container
+    /// </summary>
+    /// <param name="containerId"></param>
+    /// <returns></returns>
     [HttpDelete]
     [Route("")]
     public async Task<ActionResult<string>> DeleteContainer(string containerId)
