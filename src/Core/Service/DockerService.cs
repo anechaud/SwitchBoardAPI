@@ -17,22 +17,15 @@ namespace SwitchBoardApi.Core.Service
 
         public async Task<bool> DeleteContainer(string containerId)
         {
-            try
-            {
-                await _dockerHost.StopContainer(containerId);
-                await _dockerHost.RemoveContainer(containerId);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            await _dockerHost.StopContainer(containerId);
+            await _dockerHost.RemoveContainer(containerId);
+            return true;
         }
 
-        public async Task<IEnumerable<string>> MonitorContainer()
+        public async Task<IEnumerable<ContainerCondition>> MonitorContainer()
         {
             var containers = await _dockerHost.ListContainers();
-            var statusList = new List<string>();
+            var statusList = new List<ContainerCondition>();
             foreach (var item in containers)
             {
                 var continer = new ContainerCondition
@@ -41,7 +34,7 @@ namespace SwitchBoardApi.Core.Service
                     Status = item.State,
                     ContainerName = item.Names.Select(x => x).FirstOrDefault()
                 };
-                statusList.Add(continer.ToString());
+                statusList.Add(continer);
             }
             return statusList;
         }

@@ -6,7 +6,6 @@ using SwitchBoardApi.Core.Service;
 
 namespace SwitchBoardApi.API;
 
-//[ApiController]
 [Route("api/SwitchBoard")]
 public class SwitchBoardApi : ControllerBase
 {
@@ -21,10 +20,10 @@ public class SwitchBoardApi : ControllerBase
 
     [HttpGet]
     [Route("")]
-    public async Task<ActionResult<string>> GetAllContainerStatus()
+    public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetAllContainerStatus()
     {
         var containerStatus = await _dockerService.MonitorContainer();
-        return Ok(JsonConvert.SerializeObject(containerStatus));
+        return Ok(containerStatus);
     }
 
     [HttpPost]
@@ -48,6 +47,5 @@ public class SwitchBoardApi : ControllerBase
     {
         await _dockerService.DeleteContainer(containerId);
         return Ok("Deleted");
-
     }
 }

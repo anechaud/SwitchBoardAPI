@@ -37,6 +37,11 @@ namespace SwitchBoardApi
                     errorDetails.StatusCode = (int)HttpStatusCode.BadRequest;
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
+                case DockerContainerNotFoundException:
+                    errorDetails.Message = exception.Message;
+                    errorDetails.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    break;
                 case DockerImageNotFoundException:
                     errorDetails.Message = exception.Message;
                     errorDetails.StatusCode = (int)HttpStatusCode.NotFound;
