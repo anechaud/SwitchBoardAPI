@@ -22,7 +22,7 @@ SwitchBoardApi efficiently manages computational simulation resources. The API w
 | GET | /api/SwitchBoard/containers | Get all container status |
 | GET | /api/SwitchBoard/containers/{page}/{limit} | Get all container status - with pagination |
 | POST | /api/SwitchBoard/computation | Starts a container |
-| DELETE | /api/SwitchBoard/{containerId} | Stops and removes a container |
+| DELETE | /api/SwitchBoard/containers/{containerId} | Stops and removes a container |
 
 ### Api Documet
 {
