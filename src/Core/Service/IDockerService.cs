@@ -8,5 +8,6 @@ namespace SwitchBoardApi.Core.Service
 		public Task StartContainer(ContainerRequest containerRequest, CancellationToken ct = default);
 		public Task<bool> DeleteContainer(string containerId);
 		public Task<IEnumerable<ContainerCondition>> MonitorContainer();
-	}
+		public Task<PaginationMetadata<ContainerCondition>> MonitorContainer(int page = 1, int limit = 10);
+    }
 }

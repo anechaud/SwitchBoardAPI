@@ -23,11 +23,32 @@ public class SwitchBoardApi : ControllerBase
     /// </summary>
     /// <returns>A model that has information about all the containers state</returns>
     [HttpGet]
-    [Route("")]
+    [Route("/containers")]
     public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetAllContainerStatus()
     {
         var containerStatus = await _dockerService.MonitorContainer();
         return Ok(containerStatus);
+    }
+
+    /// <summary>
+    /// Get all container status - possibility for a pages result
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("/containers/{page}/{limit}")]
+    public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetPagegContainerStatus(int page = 1, int limit = 10)
+    {
+        var containerStatus = await _dockerService.MonitorContainer(page, limit);
+        HttpContext.Response.Headers.Add("Paging-Headers-CurrentPage", JsonConvert.SerializeObject(containerStatus.CurrentPage));
+        HttpContext.Response.Headers.Add("Paging-Headers-NextPage", JsonConvert.SerializeObject(containerStatus.NextPage));
+        HttpContext.Response.Headers.Add("Paging-Headers-PageSize", JsonConvert.SerializeObject(containerStatus.PageSize));
+        HttpContext.Response.Headers.Add("Paging-Headers-PreviousPage", JsonConvert.SerializeObject(containerStatus.PreviousPage));
+        HttpContext.Response.Headers.Add("Paging-Headers-TotalCount", JsonConvert.SerializeObject(containerStatus.TotalCount));
+        HttpContext.Response.Headers.Add("Paging-Headers-TotalPages", JsonConvert.SerializeObject(containerStatus.TotalPages));
+
+        return Ok(containerStatus.ListOfItems);
     }
 
     /// <summary>
@@ -38,7 +59,7 @@ public class SwitchBoardApi : ControllerBase
     /// <returns>Name of the started container</returns>
     /// <exception cref="BadHttpRequestException"></exception>
     [HttpPost]
-    [Route("")]
+    [Route("/computation")]
     public async Task<ActionResult> CreateContiner([FromBody] ContainerRequest containerRequest, CancellationToken ct = default)
     {
         if (!ModelState.IsValid)
@@ -58,7 +79,7 @@ public class SwitchBoardApi : ControllerBase
     /// <param name="containerId"></param>
     /// <returns></returns>
     [HttpDelete]
-    [Route("")]
+    [Route("/containers/{containerId}")]
     public async Task<ActionResult<string>> DeleteContainer(string containerId)
     {
         await _dockerService.DeleteContainer(containerId);

@@ -21,6 +21,12 @@ namespace SwitchBoardApi.Core.Host
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Pulls the image from docker
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         private async Task PullImageIfNotExist(string image, CancellationToken ct = default)
         {
             var existingContainers = await ListContainers();
@@ -41,6 +47,12 @@ namespace SwitchBoardApi.Core.Host
             }
         }
 
+        /// <summary>
+        /// Create a container
+        /// </summary>
+        /// <param name="createContainerParameters"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         public async Task<string> CreateContainer(CreateContainerParameters createContainerParameters, CancellationToken ct = default)
         {
             await PullImageIfNotExist(createContainerParameters.Image, ct);
@@ -58,6 +70,12 @@ namespace SwitchBoardApi.Core.Host
             return (await _dockerClient.Containers.CreateContainerAsync(createContainerParameters, ct)).ID;
         }
 
+        /// <summary>
+        /// Start a container
+        /// </summary>
+        /// <param name="containerId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         public async Task<bool> StartContainer(string containerId, CancellationToken ct = default)
         {
             var isStarted = await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters(), ct);
@@ -70,7 +88,10 @@ namespace SwitchBoardApi.Core.Host
             return new ValueTask();
         }
 
-
+        /// <summary>
+        /// List all containers in the docker daemon
+        /// </summary>
+        /// <returns></returns>
         public async Task<IList<ContainerListResponse>> ListContainers()
         {
             IList<ContainerListResponse> containers = await _dockerClient.Containers.ListContainersAsync(
@@ -81,6 +102,11 @@ namespace SwitchBoardApi.Core.Host
             return containers;
         }
 
+        /// <summary>
+        /// Remove a container
+        /// </summary>
+        /// <param name="containerId"></param>
+        /// <returns></returns>
         public async Task RemoveContainer(string containerId)
         {
             await _dockerClient.Containers.RemoveContainerAsync(
@@ -89,6 +115,11 @@ namespace SwitchBoardApi.Core.Host
                                                     CancellationToken.None);
         }
 
+        /// <summary>
+        /// Stop a container
+        /// </summary>
+        /// <param name="containerId"></param>
+        /// <returns></returns>
         public async Task<bool> StopContainer(string containerId)
         {
             var stopped = await _dockerClient.Containers.StopContainerAsync(
@@ -102,12 +133,21 @@ namespace SwitchBoardApi.Core.Host
             return stopped;
         }
 
+        /// <summary>
+        /// List all images
+        /// </summary>
+        /// <returns></returns>
         private async Task<IList<ImagesListResponse>> ListImages()
         {
             var images = await _dockerClient.Images.ListImagesAsync(new ImagesListParameters() { All = true });
             return images;
         }
 
+        /// <summary>
+        /// Get the docker uri based on os
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private static string DockerApiUri()
         {
             if (IsWindows)
