@@ -25,7 +25,7 @@ public class SwitchBoardApi : ControllerBase
     /// </summary>
     /// <returns>A model that has information about all the containers state</returns>
     [HttpGet]
-    [Route("/containers")]
+    [Route("containers")]
     public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetAllContainerStatus()
     {
         var containerStatus = await _dockerService.MonitorContainer();
@@ -39,7 +39,7 @@ public class SwitchBoardApi : ControllerBase
     /// <param name="limit"></param>
     /// <returns></returns>
     [HttpGet]
-    [Route("/containers/{page}/{limit}")]
+    [Route("containers/{page}/{limit}")]
     public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetPagegContainerStatus(int page = 1, int limit = 10)
     {
         var containerStatus = await _dockerService.MonitorContainer(page, limit);
@@ -61,7 +61,7 @@ public class SwitchBoardApi : ControllerBase
     /// <returns>Name of the started container</returns>
     /// <exception cref="BadHttpRequestException"></exception>
     [HttpPost]
-    [Route("/computation")]
+    [Route("computation")]
     public async Task<ActionResult> CreateContiner([FromBody] ContainerRequest containerRequest, CancellationToken ct = default)
     {
         if (!ModelState.IsValid)
@@ -81,7 +81,7 @@ public class SwitchBoardApi : ControllerBase
     /// <param name="containerId"></param>
     /// <returns></returns>
     [HttpDelete]
-    [Route("/containers/{containerId}")]
+    [Route("containers/{containerId}")]
     public async Task<ActionResult<string>> DeleteContainer(string containerId)
     {
         await _dockerService.DeleteContainer(containerId);
