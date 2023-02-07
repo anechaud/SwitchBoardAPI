@@ -62,6 +62,8 @@ namespace SwitchBoardApi.API
             }
         }
 
+        //Not not at all recomended for production. Just created for demp purpose. In real world there should be a authorozation service, or
+        //auth service provider or atleast a database to store user credentials.
         private UserInfo? GetUser(string email, string password)
         {
             var useremail = _configuration["UserInfo:Email"];
