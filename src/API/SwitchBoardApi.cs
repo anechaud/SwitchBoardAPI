@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SwitchBoardApi.Core.Model;
@@ -6,6 +7,7 @@ using SwitchBoardApi.Core.Service;
 
 namespace SwitchBoardApi.API;
 
+[Authorize]
 [Route("api/SwitchBoard")]
 public class SwitchBoardApi : ControllerBase
 {
