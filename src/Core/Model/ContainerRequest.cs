@@ -36,7 +36,7 @@ namespace SwitchBoardApi.Core.Model
             var path = Convert.ToString(value)??string.Empty;
             string pattern = "^(?=([/\\\\]))(?:\\1[^\\\\/\"<>|\\u0000-\\u001f]+)+\\1?\\r?$";
             var success = Regex.IsMatch(path, pattern);
-            if (!success)
+            if (!success && !string.IsNullOrEmpty(path))
             {
                 return new ValidationResult(errMsg);
             }

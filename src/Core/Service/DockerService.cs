@@ -72,13 +72,13 @@ namespace SwitchBoardApi.Core.Service
             var totalPages = (int)Math.Ceiling(containers.Count / (double)limit);
             return new PaginationMetadata<ContainerCondition>
             {
-                TotalCount=containers.Count,
-                CurrentPage=page,
-                ListOfItems=statusList,
-                PageSize=limit,
-                TotalPages= totalPages,
+                TotalCount = containers.Count,
+                CurrentPage = page,
+                ListOfItems = statusList,
+                PageSize = limit,
+                TotalPages = totalPages,
                 NextPage = page < totalPages,
-                PreviousPage = page>1
+                PreviousPage = page > 1
             };
         }
 
@@ -88,14 +88,14 @@ namespace SwitchBoardApi.Core.Service
         /// <param name="containerRequest"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task StartContainer(ContainerRequest containerRequest, CancellationToken ct = default)
+        public async Task<string> StartContainer(ContainerRequest containerRequest, CancellationToken ct = default)
         {
             var containerParameter = FormContainerParamObject(containerRequest);
 
             var containers = await _dockerHost.ListContainers();
             var existingContainer = containers?.Where(x => x.Names.FirstOrDefault().Contains(containerParameter.Name))?.FirstOrDefault();
             string? containerId;
-            if (existingContainer != null)
+            if (existingContainer != null && !string.IsNullOrEmpty(containerRequest.ContainerName))
             {
                 containerId = existingContainer.ID;
             }
@@ -104,7 +104,8 @@ namespace SwitchBoardApi.Core.Service
                 containerId = await _dockerHost.CreateContainer(containerParameter, ct);
             }
 
-            var started = await _dockerHost.StartContainer(containerId, ct);
+            await _dockerHost.StartContainer(containerId, ct);
+            return containerId;
         }
 
         /// <summary>

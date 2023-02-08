@@ -29,6 +29,7 @@ public class SwitchBoardApi : ControllerBase
     public async Task<ActionResult<IEnumerable<ContainerCondition>>> GetAllContainerStatus()
     {
         var containerStatus = await _dockerService.MonitorContainer();
+        _logger.LogInformation("Fetched all containers");
         return Ok(containerStatus);
     }
 
@@ -49,6 +50,7 @@ public class SwitchBoardApi : ControllerBase
         HttpContext.Response.Headers.Add("Paging-Headers-PreviousPage", JsonConvert.SerializeObject(containerStatus.PreviousPage));
         HttpContext.Response.Headers.Add("Paging-Headers-TotalCount", JsonConvert.SerializeObject(containerStatus.TotalCount));
         HttpContext.Response.Headers.Add("Paging-Headers-TotalPages", JsonConvert.SerializeObject(containerStatus.TotalPages));
+        _logger.LogInformation($"Fetched {limit} containers for page {page}");
 
         return Ok(containerStatus.ListOfItems);
     }
@@ -71,8 +73,10 @@ public class SwitchBoardApi : ControllerBase
                                 .Select(e => e.ErrorMessage));
             throw new BadHttpRequestException(message);
         }
-        await _dockerService.StartContainer(containerRequest, ct);
-        return StatusCode(201, $"Container started - {containerRequest.ContainerName}");
+        var containerId = await _dockerService.StartContainer(containerRequest, ct);
+        _logger.LogInformation($"Container started - {containerId}");
+
+        return StatusCode(201, $"Container started - {containerId}");
     }
 
     /// <summary>
@@ -85,6 +89,8 @@ public class SwitchBoardApi : ControllerBase
     public async Task<ActionResult<string>> DeleteContainer(string containerId)
     {
         await _dockerService.DeleteContainer(containerId);
-        return Ok("Deleted");
+        _logger.LogInformation($"Container removed - {containerId}");
+
+        return Ok($"Deleted - {containerId}");
     }
 }
